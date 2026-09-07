@@ -10,6 +10,7 @@
 .container{width:min(var(--max),calc(100% - 2*var(--pad)));margin:auto}.nav{position:fixed;z-index:20;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:22px var(--pad);background:linear-gradient(to bottom,rgba(17,17,15,.82),transparent);backdrop-filter:blur(6px)}.brand{font-size:13px;letter-spacing:.11em;text-transform:uppercase;font-weight:700}.nav a:last-child{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
 .hero{padding-top:150px}.eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}.hero h1{font-size:clamp(52px,8.2vw,112px);line-height:.88;letter-spacing:-.065em;font-weight:600;margin:0;max-width:1050px}.hero-intro{display:grid;grid-template-columns:1.35fr .65fr;gap:70px;margin:36px 0 70px}.hero-intro p{font-size:clamp(18px,2vw,25px);max-width:760px;margin:0}.meta{border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:12px}.meta div{padding:7px 0;border-bottom:1px solid var(--line)}.meta b{color:var(--paper);font-weight:500}
 .hero-video{width:100%;max-height:78vh;object-fit:cover;background:#050505;display:block}.caption{font-size:11px;color:var(--muted);margin-top:10px}
+.media-note{border:1px solid var(--line);padding:16px 18px;margin-top:16px;color:var(--muted);font-size:12px}
 section{padding:110px 0}.section-label{font-size:11px;letter-spacing:.13em;color:var(--muted);text-transform:uppercase;margin-bottom:16px}h2{font-size:clamp(40px,5.5vw,72px);line-height:.94;letter-spacing:-.05em;font-weight:500;margin:0 0 28px}.copy{max-width:760px;font-size:18px;color:#d5d2cb}.two{display:grid;grid-template-columns:1fr 1fr;gap:70px}.facts{border-top:1px solid var(--line)}.fact{padding:18px 0;border-bottom:1px solid var(--line)}.fact small{display:block;color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}.fact strong{font-size:16px;font-weight:500}
 .gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.gallery img{width:100%;height:100%;min-height:330px;object-fit:cover;display:block}.gallery img:first-child{grid-column:span 2;min-height:520px}
 .process{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.process-card{border:1px solid var(--line);padding:26px;min-height:190px}.process-card span{color:var(--muted);font-size:11px;letter-spacing:.12em}.process-card h3{font-size:22px;font-weight:500;margin:28px 0 10px}.process-card p{font-size:13px;color:var(--muted);margin:0}
@@ -36,9 +37,7 @@ footer{padding:25px 0 35px;border-top:1px solid var(--line);display:flex;justify
       <div><b>Status</b> — Client project · Zimbabwe</div>
     </div>
   </div>
-  <video class="hero-video" autoplay muted loop playsinline poster="assets/kam-detail-1.jpg">
-    <source src="assets/kam-motor-spares.mp4" type="video/mp4">
-  </video>
+  <div class="media-note">KAM media assets are not currently present in this repository's <code>assets/</code> directory, so the page preserves the case-study content without pointing at broken or substitute files.</div>
   <div class="caption">Selected sequence from the KAM Motor Spares campaign.</div>
 </header>
 
@@ -54,12 +53,6 @@ footer{padding:25px 0 35px;border-top:1px solid var(--line);display:flex;justify
   <div class="section-label">02 — The Concept</div>
   <h2>From impact to confidence.</h2>
   <p class="copy">The film opens on the moment of impact — a wheel striking a pothole — then moves through mechanical strain, the driver's experience, and the product itself, before resolving into a calm, confident brand close. Locked visual references kept the same vehicle, driver and lighting logic consistent across every generated scene.</p>
-  <div class="gallery" style="margin-top:45px">
-    <img src="assets/kam-detail-1.jpg" alt="Wheel striking a pothole on an urban Harare road">
-    <img src="assets/kam-detail-2.jpg" alt="Macro shot of a suspension component under load">
-    <img src="assets/kam-detail-3.jpg" alt="Suspension assembly product hero shot">
-    <img src="assets/kam-detail-4.jpg" alt="Vehicle driving confidently on a smooth road">
-  </div>
 </div>
 </section>
 
