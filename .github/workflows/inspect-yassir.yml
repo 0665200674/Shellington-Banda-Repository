@@ -1,0 +1,75 @@
+name: Inspect Yassir Assets
+
+on:
+  push:
+    paths:
+      - 'assets/SHELF TO LIFE.mp4'
+      - 'assets/YASSIR_*.png'
+      - '.github/workflows/inspect-yassir.yml'
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build visual contact sheet
+        shell: bash
+        run: |
+          set -e
+          mkdir -p inspect
+          python - <<'PY'
+          from PIL import Image, ImageOps, ImageDraw
+          from pathlib import Path
+          files = [
+              Path('assets/YASSIR_BAG_REFERENCES.png'),
+              Path('assets/YASSIR_DARKSTORE_01_WIDE_ESTABLISHING_SHOT.png'),
+              Path('assets/YASSIR_FAMILY_01_FAMILY_TOGETHER_LIFESTYLE.png'),
+              Path('assets/YASSIR_RIDER_GROK_REFERENCE_LOCKED.png'),
+          ]
+          thumbs=[]
+          for p in files:
+              im=Image.open(p).convert('RGB')
+              im.thumbnail((900,650))
+              canvas=Image.new('RGB',(920,730),'white')
+              x=(920-im.width)//2; y=35
+              canvas.paste(im,(x,y))
+              d=ImageDraw.Draw(canvas)
+              d.text((20,690),p.name,fill='black')
+              thumbs.append(canvas)
+          sheet=Image.new('RGB',(1840,1460),'#dddddd')
+          for i,im in enumerate(thumbs):
+              sheet.paste(im,((i%2)*920,(i//2)*730))
+          sheet.save('inspect/yassir-contact-sheet.jpg',quality=92)
+          PY
+
+      - name: Extract video frames
+        shell: bash
+        run: |
+          ffmpeg -hide_banner -loglevel error -i 'assets/SHELF TO LIFE.mp4' -vf "fps=1/3,scale=960:-2" -frames:v 12 inspect/frame-%02d.jpg
+          python - <<'PY'
+          from PIL import Image, ImageDraw
+          from pathlib import Path
+          files=sorted(Path('inspect').glob('frame-*.jpg'))
+          cards=[]
+          for p in files:
+              im=Image.open(p).convert('RGB')
+              im.thumbnail((640,360))
+              c=Image.new('RGB',(660,400),'white')
+              c.paste(im,((660-im.width)//2,10))
+              ImageDraw.Draw(c).text((15,375),p.name,fill='black')
+              cards.append(c)
+          cols=3; rows=(len(cards)+cols-1)//cols
+          sheet=Image.new('RGB',(cols*660,rows*400),'#dddddd')
+          for i,im in enumerate(cards): sheet.paste(im,((i%cols)*660,(i//cols)*400))
+          sheet.save('inspect/yassir-video-contact-sheet.jpg',quality=92)
+          PY
+
+      - name: Upload inspection artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yassir-inspection
+          path: inspect/
+          retention-days: 1
