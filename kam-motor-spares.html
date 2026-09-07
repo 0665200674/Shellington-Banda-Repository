@@ -10,9 +10,8 @@
 .container{width:min(var(--max),calc(100% - 2*var(--pad)));margin:auto}.nav{position:fixed;z-index:20;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:22px var(--pad);background:linear-gradient(to bottom,rgba(17,17,15,.82),transparent);backdrop-filter:blur(6px)}.brand{font-size:13px;letter-spacing:.11em;text-transform:uppercase;font-weight:700}.nav a:last-child{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
 .hero{padding-top:150px}.eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}.hero h1{font-size:clamp(52px,8.2vw,112px);line-height:.88;letter-spacing:-.065em;font-weight:600;margin:0;max-width:1050px}.hero-intro{display:grid;grid-template-columns:1.35fr .65fr;gap:70px;margin:36px 0 70px}.hero-intro p{font-size:clamp(18px,2vw,25px);max-width:760px;margin:0}.meta{border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:12px}.meta div{padding:7px 0;border-bottom:1px solid var(--line)}.meta b{color:var(--paper);font-weight:500}
 .hero-video{width:100%;max-height:78vh;object-fit:cover;background:#050505;display:block}.caption{font-size:11px;color:var(--muted);margin-top:10px}
-.media-note{border:1px solid var(--line);padding:16px 18px;margin-top:16px;color:var(--muted);font-size:12px}
 section{padding:110px 0}.section-label{font-size:11px;letter-spacing:.13em;color:var(--muted);text-transform:uppercase;margin-bottom:16px}h2{font-size:clamp(40px,5.5vw,72px);line-height:.94;letter-spacing:-.05em;font-weight:500;margin:0 0 28px}.copy{max-width:760px;font-size:18px;color:#d5d2cb}.two{display:grid;grid-template-columns:1fr 1fr;gap:70px}.facts{border-top:1px solid var(--line)}.fact{padding:18px 0;border-bottom:1px solid var(--line)}.fact small{display:block;color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}.fact strong{font-size:16px;font-weight:500}
-.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.gallery img{width:100%;height:100%;min-height:330px;object-fit:cover;display:block}.gallery img:first-child{grid-column:span 2;min-height:520px}
+.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.gallery img{width:100%;height:100%;min-height:330px;object-fit:cover;display:block}.gallery img:first-child{grid-column:span 2;min-height:520px}.gallery img{background:#181815}
 .process{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.process-card{border:1px solid var(--line);padding:26px;min-height:190px}.process-card span{color:var(--muted);font-size:11px;letter-spacing:.12em}.process-card h3{font-size:22px;font-weight:500;margin:28px 0 10px}.process-card p{font-size:13px;color:var(--muted);margin:0}
 .toolstrip{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}.pill{border:1px solid var(--line);padding:9px 12px;font-size:11px;color:#d4d1ca}
 .result{background:var(--paper);color:var(--bg)}.result .section-label{color:#696761}.result .copy{color:#484741}.result-box{border-top:1px solid rgba(17,17,15,.22);padding-top:24px;margin-top:34px}.result-box p{font-size:15px;max-width:800px}
@@ -37,7 +36,10 @@ footer{padding:25px 0 35px;border-top:1px solid var(--line);display:flex;justify
       <div><b>Status</b> — Client project · Zimbabwe</div>
     </div>
   </div>
-  <div class="media-note">KAM media assets are not currently present in this repository's <code>assets/</code> directory, so the page preserves the case-study content without pointing at broken or substitute files.</div>
+  <video class="hero-video" controls playsinline preload="metadata">
+    <source src="assets/kam-motor-spares.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
   <div class="caption">Selected sequence from the KAM Motor Spares campaign.</div>
 </header>
 
@@ -58,7 +60,20 @@ footer{padding:25px 0 35px;border-top:1px solid var(--line);display:flex;justify
 
 <section>
 <div class="container">
-  <div class="section-label">03 — The Process</div>
+  <div class="section-label">03 — The Visual Sequence</div>
+  <h2>Impact. Detail. Product. Confidence.</h2>
+  <div class="gallery">
+    <img src="assets/kam-detail-1.jpg" alt="KAM Motor Spares campaign — pothole and wheel impact sequence" loading="lazy">
+    <img src="assets/kam-detail-2.jpg" alt="KAM Motor Spares campaign — suspension component detail" loading="lazy">
+    <img src="assets/kam-detail-3.jpg" alt="KAM Motor Spares campaign — suspension product hero" loading="lazy">
+    <img src="assets/kam-detail-4.jpg" alt="KAM Motor Spares campaign — vehicle road sequence" loading="lazy">
+  </div>
+</div>
+</section>
+
+<section>
+<div class="container">
+  <div class="section-label">04 — The Process</div>
   <h2>From script to finished commercial.</h2>
   <div class="process">
     <div class="process-card"><span>01</span><h3>Concept & Script</h3><p>Define the campaign message, tone and scene-by-scene narrative arc — from physical problem to earned trust.</p></div>
@@ -73,7 +88,7 @@ footer{padding:25px 0 35px;border-top:1px solid var(--line);display:flex;justify
 
 <section>
 <div class="container two">
-  <div><div class="section-label">04 — AI Toolkit</div><h2>Tools are part of the process, not the story.</h2></div>
+  <div><div class="section-label">05 — AI Toolkit</div><h2>Tools are part of the process, not the story.</h2></div>
   <div><p class="copy">This project relied heavily on reference-locked video generation to maintain continuity across a fully AI-generated commercial sequence.</p>
     <div class="toolstrip"><span class="pill">Grok</span><span class="pill">ChatGPT</span><span class="pill">Claude</span><span class="pill">ElevenLabs</span><span class="pill">CapCut</span><span class="pill">InShot</span><span class="pill">Promptwise</span></div>
     <p style="font-size:12px;color:var(--muted);margin-top:16px">Grok handled scene generation against locked continuity references; editing, sound and finishing were completed across the rest of the stack.</p>
@@ -83,7 +98,7 @@ footer{padding:25px 0 35px;border-top:1px solid var(--line);display:flex;justify
 
 <section class="result">
 <div class="container">
-  <div class="section-label">05 — What This Demonstrates</div>
+  <div class="section-label">06 — What This Demonstrates</div>
   <h2>Structured AI production at commercial scale.</h2>
   <p class="copy">This project demonstrates the ability to run a full AI production pipeline for a real client — holding visual and character continuity across many generated scenes, directing voiceover performance beat by beat, and compositing real brand assets into a finished, broadcast-ready commercial.</p>
   <div class="result-box"><p><b>Capabilities:</b> creative direction · continuity-locked AI video generation · scene-by-scene prompt engineering · voiceover direction · brand-safe compositing · multi-format campaign thinking · client collaboration</p></div>
