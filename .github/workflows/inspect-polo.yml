@@ -11,10 +11,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install image tooling
+        run: python -m pip install pillow
+
       - name: Build contact sheet
         run: |
           python - <<'PY'
-          from PIL import Image, ImageOps, ImageDraw, ImageFont
+          from PIL import Image, ImageDraw
           from pathlib import Path
 
           names = [
