@@ -1,0 +1,54 @@
+name: Inspect Polo Images
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build contact sheet
+        run: |
+          python - <<'PY'
+          from PIL import Image, ImageOps, ImageDraw, ImageFont
+          from pathlib import Path
+
+          names = [
+              '1.jpg','3.jpg','5.jpg','6.jpg','8.jpg','9.jpg',
+              '10.jpg','11.jpg','12.jpg','13.jpg','14.jpg','15.jpg'
+          ]
+          out = Path('polo-contact-sheet.jpg')
+          thumb_w, thumb_h = 420, 300
+          label_h = 44
+          cols = 3
+          rows = (len(names) + cols - 1) // cols
+          sheet = Image.new('RGB', (cols*thumb_w, rows*(thumb_h+label_h)), 'white')
+          draw = ImageDraw.Draw(sheet)
+
+          for i, name in enumerate(names):
+              p = Path('assets') / name
+              im = Image.open(p).convert('RGB')
+              im.thumbnail((thumb_w-20, thumb_h-20), Image.Resampling.LANCZOS)
+              tile = Image.new('RGB', (thumb_w, thumb_h), '#eeeeee')
+              x = (thumb_w-im.width)//2
+              y = (thumb_h-im.height)//2
+              tile.paste(im, (x,y))
+              x0 = (i % cols) * thumb_w
+              y0 = (i // cols) * (thumb_h+label_h)
+              sheet.paste(tile, (x0,y0))
+              draw.text((x0+12, y0+thumb_h+10), name, fill='black')
+
+          sheet.save(out, quality=88, optimize=True)
+          print('Created', out)
+          PY
+
+      - name: Upload contact sheet
+        uses: actions/upload-artifact@v4
+        with:
+          name: polo-image-review
+          path: polo-contact-sheet.jpg
+          retention-days: 2
