@@ -16,7 +16,7 @@ section{padding:110px 0}.section-label{font-size:11px;letter-spacing:.13em;color
 .next{display:flex;justify-content:space-between;gap:30px;align-items:end;border-top:1px solid var(--line);padding-top:30px}.next .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}.next .title{font-size:28px}.back{font-size:12px;letter-spacing:.09em;text-transform:uppercase;border-bottom:1px solid var(--paper);padding-bottom:5px}
 footer{padding:25px 0 35px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
 @media(max-width:760px){.hero{padding-top:120px}.hero-intro,.two{grid-template-columns:1fr;gap:35px}.gallery{grid-template-columns:1fr}.gallery img:first-child{grid-column:auto}.gallery img{min-height:260px}.process{grid-template-columns:1fr}.next{align-items:start;flex-direction:column}}
-</style>
+.hero-video-control{position:absolute;z-index:4;left:clamp(20px,4vw,52px);bottom:clamp(22px,4vh,46px);appearance:none;border:1px solid rgba(242,240,235,.45);background:rgba(17,17,15,.32);backdrop-filter:blur(10px);color:#f2f0eb;padding:12px 16px;font:600 10px/1 Inter,ui-sans-serif,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .2s ease,border-color .2s ease,transform .2s ease}.hero-video-control:hover{background:rgba(17,17,15,.62);border-color:rgba(242,240,235,.75);transform:translateY(-1px)}.hero-video-control:focus-visible{outline:2px solid currentColor;outline-offset:3px}.hero:after{pointer-events:none}</style>
 </head>
 <body>
 <nav class="nav"><a class="brand" href="index.html">Shellington Banda</a><a href="index.html#work">← Back to work</a></nav>
@@ -82,4 +82,6 @@ footer{padding:25px 0 35px;border-top:1px solid var(--line);display:flex;justify
 </div></div></section>
 </main>
 <footer class="container"><div>Shellington Banda</div><div>AI Creative Technologist · Portfolio V1</div></footer>
-</body></html>
+<script>
+(()=>{const hero=document.querySelector('.hero');if(!hero)return;const video=hero.querySelector('video');if(!video)return;const button=document.createElement('button');button.type='button';button.className='hero-video-control';button.setAttribute('aria-label','Play film with sound');button.textContent='▶ PLAY FILM · SOUND ON';hero.appendChild(button);video.removeAttribute('controls');video.removeAttribute('autoplay');video.removeAttribute('muted');video.removeAttribute('loop');video.setAttribute('playsinline','');video.setAttribute('preload','metadata');video.addEventListener('play',()=>{button.textContent='❚❚ PAUSE · SOUND ON';button.setAttribute('aria-label','Pause film');});video.addEventListener('pause',()=>{button.textContent='▶ RESUME · SOUND ON';button.setAttribute('aria-label','Resume film with sound');});video.addEventListener('ended',()=>{button.textContent='↻ REPLAY · SOUND ON';button.setAttribute('aria-label','Replay film with sound');});button.addEventListener('click',()=>{if(video.paused||video.ended){if(video.ended)video.currentTime=0;video.muted=false;const p=video.play();if(p)p.catch(()=>{video.controls=true;});}else{video.pause();}});})();
+</script></body></html>
