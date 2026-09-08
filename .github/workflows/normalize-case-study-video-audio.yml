@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   normalize:
     runs-on: ubuntu-latest
@@ -17,35 +20,26 @@ jobs:
           from pathlib import Path
           import re
 
-          pages = [
-              p for p in Path('.').glob('*.html')
-              if p.name != 'index.html'
-          ]
-
-          changed = []
+          pages = [p for p in Path('.').glob('*.html') if p.name != 'index.html']
           pattern = re.compile(r'<video\b([^>]*)>', re.I)
 
           def normalize(match):
               attrs = match.group(1)
-              original = attrs
               attrs = re.sub(r'\s+autoplay(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+))?', '', attrs, flags=re.I)
               attrs = re.sub(r'\s+muted(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+))?', '', attrs, flags=re.I)
               attrs = re.sub(r'\s+loop(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+))?', '', attrs, flags=re.I)
-              if not re.search(r'\bcontrols(?:\s*=|\s|$)', attrs, re.I):
-                  attrs += ' controls'
-              if not re.search(r'\bplaysinline(?:\s*=|\s|$)', attrs, re.I):
-                  attrs += ' playsinline'
-              if not re.search(r'\bpreload\s*=', attrs, re.I):
-                  attrs += ' preload="metadata"'
+              if not re.search(r'\bcontrols(?:\s*=|\s|$)', attrs, re.I): attrs += ' controls'
+              if not re.search(r'\bplaysinline(?:\s*=|\s|$)', attrs, re.I): attrs += ' playsinline'
+              if not re.search(r'\bpreload\s*=', attrs, re.I): attrs += ' preload="metadata"'
               return '<video' + attrs + '>'
 
+          changed = []
           for page in pages:
               text = page.read_text(encoding='utf-8')
               new = pattern.sub(normalize, text)
               if new != text:
                   page.write_text(new, encoding='utf-8')
-                  changed.append(str(page))
-
+                  changed.append(page.name)
           print('Normalized:', ', '.join(changed) if changed else 'none')
 
       - name: Commit normalized pages and remove temporary workflow
@@ -53,11 +47,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm -f .github/workflows/normalize-case-study-video-audio.yml
           git add '*.html'
-          if git diff --cached --quiet; then
-            git commit -m "Normalize case-study video audio behavior" || true
-          else
-            git commit -m "Normalize case-study video audio behavior"
-          fi
+          git rm -f .github/workflows/normalize-case-study-video-audio.yml
+          git commit -m "Normalize case-study video audio behavior"
           git push
