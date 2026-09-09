@@ -1,0 +1,87 @@
+name: Clean Case Study Films
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  clean-films:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add unobstructed film sections
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          skip = {'index.html', 'ava-nyfw.html', 'kam-motor-spares.html', 'automotive-travel-campaign.html', 'ava-de-parfum.html', 'lumen.html'}
+
+          def first_tag_block(text, tag):
+              m = re.search(rf'<{tag}\\b[^>]*>.*?</{tag}>', text, flags=re.I|re.S)
+              return m
+
+          changed = []
+          for path in sorted(Path('.').glob('*.html')):
+              if path.name in skip:
+                  continue
+              text = path.read_text(encoding='utf-8')
+              if 'class="hero"' not in text or '<video' not in text:
+                  continue
+
+              header = re.search(r'<header\\b[^>]*class="[^"]*\\bhero\\b[^"]*"[^>]*>.*?</header>', text, flags=re.I|re.S)
+              if not header:
+                  continue
+              hero_html = header.group(0)
+              video = first_tag_block(hero_html, 'video')
+              if not video:
+                  continue
+
+              # If the hero itself is already a clean, non-overlay presentation, leave it alone.
+              if re.search(r'\\.hero(?:-video)?\\s*\\{[^}]*position:\s*(?:static|relative)', text, flags=re.I|re.S) and not re.search(r'\\.hero video\\s*\\{[^}]*position:\s*absolute', text, flags=re.I|re.S):
+                  continue
+              if re.search(r'\\.hero video\\s*\\{[^}]*position:\s*absolute', text, flags=re.I|re.S):
+                  pass
+              else:
+                  continue
+
+              # Do not add a duplicate if the page already contains a standalone video after the hero.
+              after_hero = text[header.end():]
+              if '<video' in after_hero:
+                  continue
+
+              src_match = re.search(r'<source\\b[^>]*src="([^"]+)"', video.group(0), flags=re.I)
+              if not src_match:
+                  continue
+              src = src_match.group(1)
+              poster_match = re.search(r'poster="([^"]+)"', video.group(0), flags=re.I)
+              poster = poster_match.group(1) if poster_match else ''
+
+              title = re.search(r'<h1>(.*?)</h1>', hero_html, flags=re.I|re.S)
+              project = re.sub(r'<[^>]+>', '', title.group(1)).strip() if title else path.stem.replace('-', ' ').title()
+              section = f'''\n<section class="film-feature">\n  <div class="container">\n    <div style="display:flex;justify-content:space-between;align-items:end;gap:40px;margin-bottom:34px">\n      <div>\n        <div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Featured Film</div>\n        <h2 style="margin:0">Watch the {project} film without the overlay.</h2>\n      </div>\n      <p style="max-width:430px;color:var(--muted);font-size:13px;margin:0">The finished campaign clip is presented on its own so the imagery, performance, product and pacing can be viewed without case-study text covering the frame.</p>\n    </div>\n    <video style="display:block;width:100%;max-height:82vh;object-fit:contain;background:#090909" controls playsinline preload="metadata"{' poster="'+poster+'"' if poster else ''}>\n      <source src="{src}" type="video/mp4">\n    </video>\n  </div>\n</section>\n'''
+              text = text[:header.end()] + section + text[header.end():]
+              path.write_text(text, encoding='utf-8')
+              changed.append(path.name)
+
+          print('Updated:', ', '.join(changed) if changed else 'none')
+          Path('/tmp/changed.txt').write_text('\\n'.join(changed), encoding='utf-8')
+          PY
+
+      - name: Commit changes and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/clean-case-study-films.yml
+          git add '*.html' .github/workflows/clean-case-study-films.yml
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git commit -m "Add unobstructed film sections to case studies"
+          git push
