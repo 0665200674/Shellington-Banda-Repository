@@ -1,0 +1,40 @@
+name: Repair Lantern video link
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Point Character Storytelling to sound-bearing Lantern film
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('character-storytelling.html')
+          s = p.read_text(encoding='utf-8')
+          old = 'assets/character-storytelling.mp4'
+          new = 'assets/THE_LANTERN_OF_WILLOWBROOK_GITHUB.mp4'
+          if old not in s:
+              raise SystemExit('Old Lantern source not found')
+          s = s.replace(old, new)
+          p.write_text(s, encoding='utf-8')
+      - name: Commit repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add character-storytelling.html
+          git commit -m "Use sound-bearing Lantern film"
+          git push
+      - name: Remove temporary workflow
+        if: always()
+        run: |
+          git rm .github/workflows/repair-lantern-link.yml || true
+          git commit -m "Remove temporary Lantern repair workflow" || true
+          git push || true
