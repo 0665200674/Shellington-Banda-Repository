@@ -1,0 +1,23 @@
+name: Check Sports and Character audio
+
+on:
+  push:
+    paths:
+      - '.github/workflows/check-sports-character-audio.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect media streams
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          for f in 'assets/sports.mp4' 'assets/character-storytelling.mp4'; do
+            echo "===== $f ====="
+            ffprobe -v error -show_entries stream=index,codec_type,codec_name,channels,sample_rate,duration -of default=noprint_wrappers=1 "$f" || true
+          done
