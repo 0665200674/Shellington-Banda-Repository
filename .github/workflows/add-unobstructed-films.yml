@@ -1,0 +1,84 @@
+name: Add Unobstructed Films
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-films:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add standalone film viewers
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          targets = {
+              'beauty-creator-content.html',
+              'character-storytelling.html',
+              'gerove-cinematic-ad.html',
+              'groundwork-coffee.html',
+              'ironvein.html',
+              'kae.html',
+              'lifestyle-interior.html',
+              'lm-tours.html',
+              'lumera-hair-care.html',
+              'noctura.html',
+              'polo-fields.html',
+              'product-advertising.html',
+              'sports-campaign.html',
+              'topic-3-national-history.html',
+              'verdant.html',
+              'yassir-shelf-to-life.html',
+              'zimbabwe-my-country.html',
+          }
+
+          changed = []
+          for name in sorted(targets):
+              path = Path(name)
+              if not path.exists():
+                  continue
+              text = path.read_text(encoding='utf-8')
+              if 'class="film-feature"' in text:
+                  continue
+              end = text.lower().find('</header>')
+              if end == -1:
+                  continue
+              hero = text[:end]
+              source = re.search(r'<source\b[^>]*\bsrc="([^"]+)"', hero, flags=re.I)
+              if not source:
+                  continue
+              src = source.group(1)
+              poster_match = re.search(r'\bposter="([^"]+)"', hero, flags=re.I)
+              poster = poster_match.group(1) if poster_match else ''
+              title_match = re.search(r'<h1[^>]*>(.*?)</h1>', hero, flags=re.I|re.S)
+              project = re.sub(r'<[^>]+>', '', title_match.group(1)).strip() if title_match else path.stem.replace('-', ' ').title()
+              poster_attr = f' poster="{poster}"' if poster else ''
+              section = f'''\n<section class="film-feature">\n  <div class="container">\n    <div style="display:flex;justify-content:space-between;align-items:end;gap:40px;margin-bottom:34px">\n      <div>\n        <div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Featured Film</div>\n        <h2 style="margin:0">Watch the {project} film.</h2>\n      </div>\n      <p style="max-width:430px;color:var(--muted);font-size:13px;margin:0">A dedicated viewing frame keeps the finished clip clear of the case-study copy, so the visual story can be watched without text covering the image.</p>\n    </div>\n    <video style="display:block;width:100%;max-height:82vh;object-fit:contain;background:#090909" controls playsinline preload="metadata"{poster_attr}>\n      <source src="{src}" type="video/mp4">\n    </video>\n  </div>\n</section>\n'''
+              insert_at = end + len('</header>')
+              text = text[:insert_at] + section + text[insert_at:]
+              path.write_text(text, encoding='utf-8')
+              changed.append(name)
+
+          print('Updated:', ', '.join(changed) if changed else 'none')
+          PY
+
+      - name: Commit and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/add-unobstructed-films.yml
+          git add '*.html' .github/workflows/add-unobstructed-films.yml
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git commit -m "Add unobstructed film viewers to case studies"
+          git push
