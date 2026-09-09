@@ -1,0 +1,33 @@
+name: Add LM Tours to homepage
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace duplicate product campaign with LM Tours
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text()
+          old = '''<a class="card" href="product-advertising.html"><video autoplay muted loop playsinline poster="assets/product.jpg"><source src="assets/product.mp4" type="video/mp4"></video><div class="card-info"><div class="label">AI Images · Product</div><div class="title">Product Advertising</div><div class="meta">Product-focused visual direction</div></div></a>'''
+          new = '''<a class="card" href="lm-tours.html"><video autoplay muted loop playsinline><source src="assets/LM TOURS CINEMATIC BRAND AD.mp4" type="video/mp4"></video><div class="card-info"><div class="label">AI Advertising · Chauffeur & Travel</div><div class="title">LM Tours</div><div class="meta">Cinematic brand film · premium chauffeur services · Johannesburg</div></div></a>'''
+          if old not in s:
+              raise SystemExit('Product Advertising homepage card not found; no changes made.')
+          p.write_text(s.replace(old, new, 1))
+          PY
+      - name: Commit homepage update and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/add-lm-tours-homepage.yml
+          git commit -m "Replace duplicate product campaign with LM Tours"
+          git push
