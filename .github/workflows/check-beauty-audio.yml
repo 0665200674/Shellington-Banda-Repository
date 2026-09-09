@@ -1,0 +1,19 @@
+name: Check Beauty UGC Audio
+on:
+  push:
+    paths:
+      - 'assets/beauty.mp4'
+      - '.github/workflows/check-beauty-audio.yml'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Probe beauty.mp4
+        run: |
+          echo '--- assets/beauty.mp4 stream metadata ---'
+          ffprobe -v error -show_entries stream=index,codec_type,codec_name,channels,sample_rate -of csv=p=0 assets/beauty.mp4
