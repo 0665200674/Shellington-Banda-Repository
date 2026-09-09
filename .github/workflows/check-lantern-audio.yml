@@ -1,0 +1,24 @@
+name: Check Lantern Audio
+on:
+  push:
+    paths:
+      - '.github/workflows/check-lantern-audio.yml'
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect Lantern audio stream
+        run: |
+          ffprobe -v error -show_entries stream=index,codec_name,codec_type,channels,sample_rate,duration -of default=noprint_wrappers=1 'assets/THE_LANTERN_OF_WILLOWBROOK_GITHUB.mp4'
+      - name: Remove diagnostic workflow
+        if: always()
+        run: |
+          rm -f .github/workflows/check-lantern-audio.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A .github/workflows/check-lantern-audio.yml
+          git diff --cached --quiet || git commit -m 'Remove Lantern audio diagnostic workflow'
+          git push
