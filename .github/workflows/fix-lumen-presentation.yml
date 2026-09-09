@@ -1,0 +1,66 @@
+name: Fix LUMEN presentation and inspect automotive audio
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fix LUMEN presentation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          # LUMEN case-study hero: preserve the full vertical commercial instead of cropping it into a cover frame.
+          p = Path('lumen.html')
+          text = p.read_text(encoding='utf-8')
+          text = text.replace('<header class="hero">', '<header class="hero lumen-hero">', 1)
+          css = '''.lumen-hero{min-height:auto;display:block;padding-top:105px;background:#11110f}.lumen-hero:after{display:none}.lumen-hero video{position:relative;inset:auto;display:block;width:100%;height:min(78vh,900px);max-height:none;object-fit:contain;object-position:center;background:#090909;filter:brightness(.72) saturate(.92)}.lumen-hero .hero-content{padding:48px 0 80px}.lumen-hero .hero-video-control{left:clamp(20px,4vw,52px);bottom:clamp(28px,5vh,60px)}@media(max-width:760px){.lumen-hero{padding-top:90px}.lumen-hero video{height:auto;min-height:0;max-height:none}.lumen-hero .hero-content{padding-top:34px}}.lumen-card{min-height:560px}.lumen-card video{object-fit:contain!important;background:#090909}'''
+          text = text.replace('</style>', css + '</style>', 1)
+          # Clean duplicate video attributes left by earlier normalization.
+          text = text.replace('playsinline preload="metadata" poster="assets/AVA LUMEN WARDROBE.png" playsinline preload="metadata"', 'playsinline preload="metadata" poster="assets/AVA LUMEN WARDROBE.png"', 1)
+          p.write_text(text, encoding='utf-8')
+
+          # Homepage: move LUMEN next to the other dedicated AVA campaign cards and keep the full vertical frame visible.
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          m = re.search(r'<a class="card wide" href="lumen\.html">.*?</a>', text, re.S)
+          if not m:
+              raise SystemExit('LUMEN homepage card not found')
+          lumen = m.group(0).replace('<a class="card wide" href="lumen.html">', '<a class="card lumen-card" href="lumen.html">', 1)
+          text = text[:m.start()] + text[m.end():]
+          anchor = '<a class="card" href="ava-de-parfum.html">'
+          pos = text.find(anchor)
+          if pos < 0:
+              raise SystemExit('AVA de Parfum card not found')
+          text = text[:pos] + lumen + text[pos:]
+          # Make the homepage LUMEN video use the same contained presentation as the case study.
+          text = text.replace('</style>', '.lumen-card video{object-fit:contain!important;background:#090909}.lumen-card{min-height:560px}</style>', 1)
+          p.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Inspect Car Rental / automotive audio track
+        run: |
+          if [ -f "assets/automotive.mp4" ]; then
+            echo "=== assets/automotive.mp4 stream metadata ==="
+            ffprobe -v error -show_entries stream=index,codec_type,codec_name,channels,sample_rate -of compact=p=0:nk=1 "assets/automotive.mp4" || true
+          else
+            echo "assets/automotive.mp4 not found"
+          fi
+
+      - name: Commit LUMEN fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lumen.html index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Improve LUMEN campaign presentation"
+          git push
